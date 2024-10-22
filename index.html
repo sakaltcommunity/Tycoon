@@ -37,7 +37,7 @@
 <body>
     <h1>CPUタイクーン</h1>
     <div id="game-container">
-        <p>お金: ¥<span id="money">1000</span></p>
+        <p>お金: ¥<span id="money">4000</span></p>
         <label>コア数: <input type="number" id="cores" min="1" max="16" value="4"></label><br>
         <label>スレッド数: <input type="number" id="threads" min="1" max="32" value="8"></label><br>
         <label>クロック周波数 (GHz): <input type="number" id="clock" min="1" max="5" step="0.1" value="3.5"></label><br>
@@ -49,14 +49,14 @@
     </div>
 
     <script>
-        let money = 5600;
+        let money = 4000;
         let cpuLevel = 1;
         let reputation = '普通';
         let benchmarkScore = 2800;
         let earningsInterval;
         
         // 時間ごとのお金の増加量
-        let earnings = 100;
+        let earnings = 40;
 
         // お金が一定時間ごとに増える
         function startEarnings() {
@@ -72,8 +72,8 @@
             const threads = parseInt(document.getElementById('threads').value);
             const clock = parseFloat(document.getElementById('clock').value);
             
-            // CPU開発コストの計算 (性能が高いほど高くなる)
-            const developmentCost = (cores * threads * clock * 100);
+            // CPU開発コストの計算 (低コスト)
+            const developmentCost = (cores * threads * clock * 10); // めちゃくちゃ緩くしたコスト設定
 
             if (money >= developmentCost) {
                 money -= developmentCost;
@@ -95,23 +95,23 @@
 
         // 評判の更新
         function updateReputation(cores, threads, clock) {
-            const score = (cores * threads * clock) / 100; // 評判の計算式
+            const score = (cores * threads * clock) / 100; // 評判の計算式を緩く調整
             if (score >= 5) {
                 reputation = '高評価';
-                earnings = 300; // 高評価だと収益が増える
+                earnings = cores * threads * clock * 40; // 緩くした収益設定
             } else if (score >= 2.5) {
                 reputation = '普通';
-                earnings = 150; // 普通評価だと収益が普通
+                earnings = cores * threads * clock * 20;
             } else {
                 reputation = '低評価';
-                earnings = 50; // 低評価だと収益が少ない
+                earnings = cores * threads * clock * 10;
             }
             document.getElementById('reputation').textContent = reputation;
         }
 
         // ベンチマークスコアの更新
         function updateBenchmark(cores, threads, clock) {
-            benchmarkScore = Math.floor(cores * threads * clock * 200); // スコアの計算式
+            benchmarkScore = Math.floor(cores * threads * clock * 100); // スコアの計算式
             document.getElementById('benchmark').textContent = benchmarkScore;
         }
 
