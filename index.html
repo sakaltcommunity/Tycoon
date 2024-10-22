@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPUタイクーン</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+
+        #game-container {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 0 auto;
+            width: 300px;
+            border-radius: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        input {
+            width: 50px;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>CPUタイクーン</h1>
+    <div id="game-container">
+        <p>お金: ¥<span id="money">1000</span></p>
+        <label>コア数: <input type="number" id="cores" min="1" max="16" value="4"></label><br>
+        <label>スレッド数: <input type="number" id="threads" min="1" max="32" value="8"></label><br>
+        <label>クロック周波数 (GHz): <input type="number" id="clock" min="1" max="5" step="0.1" value="3.5"></label><br>
+        <button id="develop-btn">新しいCPUを開発</button>
+        <p>現在のCPU: <span id="current-cpu">ベーシックCPU</span></p>
+        <p>性能: <span id="cpu-performance">4コア / 8スレッド / 3.5 GHz</span></p>
+        <p>評判: <span id="reputation">普通</span></p>
+        <p>ベンチマークスコア: <span id="benchmark">2800</span></p>
+    </div>
+
+    <script>
+        let money = 1536;
+        let cpuLevel = 1;
+        let reputation = '普通';
+        let benchmarkScore = 2800;
+        let earningsInterval;
+        
+        // 時間ごとのお金の増加量
+        let earnings = 100;
+
+        // お金が一定時間ごとに増える
+        function startEarnings() {
+            if (earningsInterval) clearInterval(earningsInterval);
+            earningsInterval = setInterval(() => {
+                money += earnings;
+                updateGame();
+            }, 5000); // 5秒ごとに収益が追加される
+        }
+
+        document.getElementById('develop-btn').addEventListener('click', () => {
+            const cores = parseInt(document.getElementById('cores').value);
+            const threads = parseInt(document.getElementById('threads').value);
+            const clock = parseFloat(document.getElementById('clock').value);
+            
+            // CPU開発コストの計算 (性能が高いほど高くなる)
+            const developmentCost = (cores * threads * clock * 100);
+
+            if (money >= developmentCost) {
+                money -= developmentCost;
+                cpuLevel++;
+                updatePerformance(cores, threads, clock);
+                updateReputation(cores, threads, clock);
+                updateBenchmark(cores, threads, clock);
+                updateGame();
+                startEarnings(); // 新しいCPUを開発するたびに収益もリセット
+            } else {
+                alert('お金が足りません！必要なお金: ¥' + developmentCost);
+            }
+        });
+
+        function updatePerformance(cores, threads, clock) {
+            document.getElementById('cpu-performance').textContent = `${cores}コア / ${threads}スレッド / ${clock} GHz`;
+            document.getElementById('current-cpu').textContent = `レベル ${cpuLevel} CPU`;
+        }
+
+        // 評判の更新
+        function updateReputation(cores, threads, clock) {
+            const score = (cores * threads * clock) / 100; // 評判の計算式
+            if (score >= 5) {
+                reputation = '高評価';
+                earnings = 300; // 高評価だと収益が増える
+            } else if (score >= 2.5) {
+                reputation = '普通';
+                earnings = 150; // 普通評価だと収益が普通
+            } else {
+                reputation = '低評価';
+                earnings = 50; // 低評価だと収益が少ない
+            }
+            document.getElementById('reputation').textContent = reputation;
+        }
+
+        // ベンチマークスコアの更新
+        function updateBenchmark(cores, threads, clock) {
+            benchmarkScore = Math.floor(cores * threads * clock * 200); // スコアの計算式
+            document.getElementById('benchmark').textContent = benchmarkScore;
+        }
+
+        // ゲーム内の表示を更新する関数
+        function updateGame() {
+            document.getElementById('money').textContent = money;
+        }
+
+        updateGame(); // 初期値の更新
+        startEarnings(); // ゲーム開始時の収益
+    </script>
+</body>
+</html>
